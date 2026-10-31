@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ScamSpotter — Catch Scam Messages Before They Catch You</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css/gXoogle-css=�amily=Outfit:wght@400;600;700&family=JetBrains+Mmonw:wght@400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css?v=6" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="logo">🔏</span>
+      <div>
+        <h1>ScamSpotter</h1>
+        <p>Paste the message. See the red flags.</p>
+      </div>
+    </div>
+    <nav class="tabs">
+      <button class="tab active" data-view="analyze" data-nav>Analyze</button>
+      <button class="tab" data-view="benchmark" data-nav>How accurate?</button>
+    </nav>
+  </header>
+
+  <main>
+    <!-- ============ ANALYZE ============ -->
+    <section id="view-analyze" class="view active">
+      <div class="toolbar card">
+        <div class="examples">
+          <span class="examples-label">Try an example</span>
+          <button class="chip-btn" data-example="0">🏦 Locked account</button>
+          <button class="chip-btn" data-example="1">🎁 Prize claim</button>
+          <button class="chip-btn" data-example="2">🆘 Stranded overseas</button>
+          <button class="chip-btn" data-example="3">📦 Package fee</button>
+          <button class="chip-btn" data-example="4">✅ Totally normal text</button>
+        </div>
+      </div>
+
+      <div class="card composer">
+        <label class="mono" for="msg-input">Message to scan</label>
+        <textarea id="msg-input" rows="5" placeholder="Paste a suspicious SMS, email, or DM here…" spellcheck="false"></textarea>
+        <div class="composer-actions">
+          <button id="scan-btn" class="btn primary">Scan message</button>
+          <button id="clear-btn" class="btn ghost">Clear</button>
+          <span class="muted" id="scan-meta"></span>
+        </div>
+      </div>
+
+      <div id="result" class="card result hidden">
+        <div class="verdict-row">
+          <div class="verdict" id="verdict-tag">—</div>
+          <div class="gauge">
+            <div class="gauge-bar"><div class="gauge-fill" id="gauge-fill"></div></div>
+            <span class="mono" id="gauge-num">0</span>
+          </div>
+        </div>
+        <div class="verdict-note muted" id="verdict-note"></div>
+        <div id="checks" class="checks"></div>
+      </div>
+
+      <details class="explainer card">
+        <summary>What is ScamSpotter checking for?</summary>
+        <div id="feature-explain"></div>
+      </details>
+    </section>
+
+    <!-- ============ BENCHMARK ============ -->
+    <section id="view-benchmark" class="view">
+      <div class="card">
+        <h2>How often does it flag correctly?</h2>
+        <p class="muted bench-intro">Below are <strong id="bench-n"></strong> real-world-style messages — half are
+        scams, half are everyday texts — each with a known correct label. Scan runs the same 17 checks
+        over every message, compares each verdict to the true label, and reports the four numbers that
+        matter. ScamSpotter is deliberately imperfect: watch the mismatch rows to understand
+        <em>how</em> it gets things wrong, not just that it does.</p>
+      </div>
+
+      <div class="metric-row">
+        <div class="stat card"><span class="stat-num" id="m-acc">—</span><span class="stat-lab">Accuracy</span><span class="stat-sub" id="m-acc-sub"></span></div>
+        <div class="stat card"><span class="stat-num" id="m-prec">—</span><span class="stat-lab">Precision</span><span class="stat-sub" id="m-prec-sub"></span></div>
+        <div class="stat card"><span class="stat-num" id="m-rec">—</span><span class="stat-lab">Recall</span><span class="stat-sub" id="m-rec-sub"></span></div>
+        <div class="stat card"><span class="stat-num" id="m-fpr">—</span><span class="stat-lab">False positive rate</span><span class="stat-sub" id="m-fpr-sub"></span></div>
+        <div class="stat card"><span class="stat-num" id="m-f1">—</span><span class="stat-lab">F1 score</span><span class="stat-sub" id="m-f1-sub"></span></div>
+      </div>
+
+      <div class="card matrix-card">
+        <h3>Confusion matrix (a flag = anything rated <em>Suspicious</em> or worse)</h3>
+        <div class="matrix">
+          <div></div><div class="mx-head mono">true scam</div><div class="mx-head mono">true legit</div>
+          <div class="mx-head mono">flagged</div>
+          <div class="mx-cell hit" id="mx-tp">0 <small>true positives</small></div>
+          <div class="mx-cell miss" id="mx-fp">0 <small>false positives</small></div>
+          <div class="mx-head mono">passed</div>
+          <div class="mx-cell miss" id="mx-fn">0 <small>false negatives</small></div>
+          <div class="mx-cell hit" id="mx-tn">0 <small>true negatives</small></div>
+        </div>
+      </div>
+
+      <div class="card results-card">
+        <h3>Every message, verdict vs. truth</h3>
+        <p class="muted">Mismatched messages are sorted to the top. Click a row to read the message and every check it triggered.</p>
+        <div id="bench-rows"></div>
+      </div>
+
+      <details class="explainer card" open>
+        <summary>Reading the metrics</summary>
+        <div>
+          <p><strong>Accuracy</strong> — the share of all messages ScamSpotter judged correctly.</p>
+          <p><strong>Precision</strong> — of the messages it <em>flagged</em>, how many were really scams. Low precision
+          means the tool cries wolf and you stop trusting its alarms.</p>
+          <p><strong>Recall</strong> — of the <em>real scams</em>, how many it caught. Low recall means dangerous
+          messages slip through unnoticed.</p>
+          <p><strong>False positive rate</strong> — of the <em>legit</em> messages, how many were wrongly accused. This is
+          the metric people feel personally: accusing your friend's harmless Venmo text of being a scam
+          burns more trust than one clever phishing mail surviving.</p>
+          <p><strong>F1</strong> — the balanced score of precision and recall combined, useful when neither
+          direction of error is clearly worse.</p>
+          <p class="muted">Heuristics like these back up real spam filters, password managers' phishing
+          warnings and browser Safe Browsing — no single signal decides, which is why adding
+          independent evidence beats making any one check stricter again and again.</p>
+        </div>
+      </details>
+    </section>
+  </main>
+
+  <footer>ScamSpotter — teaches the flags, admits the misses · heuristic demo, not a security product</footer>
+
+  <script src="app.js?v=4"></script>
+</body>
+</html>
