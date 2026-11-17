@@ -1,5 +1,7 @@
 # 🔍 ScamSpotter
 
+**[🌐 Open the live app →](https://scamspotter-p89j9s-preview.freebuff.page)** — paste a message and go, nothing to install.
+
 A suspicious-message analyzer you can read like an open book — paste any text or
 SMS-style message and see exactly **which red-flag checks fired, why they fired,
 and how risky the message is**. It isn't a black box: every check is visible,
@@ -42,7 +44,9 @@ security product.*
 
 ## Run it
 
-No build step, no dependencies:
+Use it right away in the browser: **[scamspotter-p89j9s-preview.freebuff.page](https://scamspotter-p89j9s-preview.freebuff.page)**
+
+Or run it locally — no build step, no dependencies:
 
 ```bash
 npx serve scamspotter         # or any static file server
